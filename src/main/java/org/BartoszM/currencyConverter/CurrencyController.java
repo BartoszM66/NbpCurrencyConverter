@@ -1,3 +1,4 @@
+/*
 package org.BartoszM.currencyConverter;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,3 +18,4 @@ public class CurrencyController {
         return currencyService.convert(code,amount);
     }
 }
+*/

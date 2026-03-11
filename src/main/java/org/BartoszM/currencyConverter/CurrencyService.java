@@ -12,14 +12,22 @@ public class CurrencyService {
         this.restTemplate = restTemplate;
     }
 
-    public ConversionResponse convert(String currencyCode, double amount) {
-        String nbpUrl = "http://api.nbp.pl/api/exchangerates/rates/a/" + currencyCode + "/?format=json";
+    private double getExchangeRate(String currencyCode){
+        String nbpUrl =  "http://api.nbp.pl/api/exchangerates/rates/a/" + currencyCode + "/?format=json";
         NbpResponse response = restTemplate.getForObject(nbpUrl, NbpResponse.class);
-        if (response == null || response.getRates() == null || response.getRates().isEmpty()) {
-            throw new RuntimeException("Nie udało się pobrać kursu dla waluty" + currencyCode);
+        if (response == null || response.getRates() == null || response.getRates().isEmpty()){
+            throw new RuntimeException("Nie udało się pobrać kursu dla waluty: " + currencyCode);
         }
-        double exchangeRate = response.getRates().get(0).getMid();
-        double resultInPln = amount * exchangeRate;
-        return new ConversionResponse(currencyCode.toUpperCase(), amount, exchangeRate, resultInPln);
+        return response.getRates().get(0).getMid();
+    }
+
+    public double convertForeignToPln(String currencyCode, double amount){
+        double exchangeRate = getExchangeRate(currencyCode);
+        return amount * exchangeRate;
+    }
+
+    public double convertPlnToForeign(String currencyCode, double amount){
+        double exchangeRate = getExchangeRate(currencyCode);
+        return amount/exchangeRate;
     }
 }
